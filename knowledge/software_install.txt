@@ -1,0 +1,26 @@
+=== Document: software_install.txt ===
+Title: Corporate Software Center and Installation Guide
+Category: Software Issue
+
+[Section: Self-Service Company Portal]
+Description: Installing pre-approved corporate software without requiring local administrator rights.
+Steps:
+1. Windows: Open the Start Menu, search for 'Company Portal' or 'Software Center' and launch it.
+2. macOS: Open Finder, navigate to Applications, and launch the 'Self Service' app.
+3. Browse the catalog of approved software (e.g. Google Chrome, Slack, VS Code).
+4. Select the desired application and click 'Install'. The system installs it automatically in the background.
+
+[Section: Request License Approval]
+Description: Requesting licenses for paid software suites (Adobe Creative Cloud, MS Visio, JetBrains IDEs).
+Steps:
+1. Navigate to the internal IT self-service store (http://it-store.company.com).
+2. Find the requested software and click 'Request License'.
+3. Fill out the business justification form (including cost center code approved by your manager).
+4. Once your manager approves the request, the software will appear automatically in your Company Portal within 2 hours.
+
+[Section: Fix Installation Failures]
+Description: What to check when a software installation fails.
+Steps:
+1. Check disk space: Verify your main drive (C: or Macintosh HD) has at least 10 GB of free space. Run Disk Cleanup or delete large download files.
+2. Pending updates: Restart your computer to clear any locked system files from pending OS updates, then try the installation again.
+3. Administrative prompts: If downloading from an external site, you must submit a temporary admin access request via the Privileged Access Manager (PAM) tool.

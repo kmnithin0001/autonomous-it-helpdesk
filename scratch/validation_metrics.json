@@ -1,0 +1,23 @@
+{
+  "results": {
+    "Scenarios": {
+      "Scenario 1: VPN Issue": true,
+      "Scenario 2: Password Reset": true,
+      "Scenario 3: Printer Issue": true,
+      "Scenario 4: Escalation Flow": true
+    },
+    "CLI Commands": {
+      "/help": true,
+      "/health": true,
+      "/agents": true,
+      "/memory": true,
+      "/tickets": true
+    },
+    "Database Integrity": true,
+    "ChromaDB Vector DB": true,
+    "Logs & Tracing": true
+  },
+  "passed": 12,
+  "total": 12,
+  "score_10": 10.0
+}

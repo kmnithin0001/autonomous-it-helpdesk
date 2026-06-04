@@ -1,0 +1,26 @@
+=== Document: printer_setup.txt ===
+Title: Corporate Printer Setup and Spooler Troubleshooting
+Category: Printer Issue
+
+[Section: Add Network Printer]
+Description: Connecting to the office shared network printer based on location.
+Steps:
+1. Windows: Go to Settings > Devices > Printers & Scanners. Click 'Add a printer or scanner'. Choose the printer named after your office room (e.g., 'PRN-NY-CONF-2B').
+2. macOS: Go to System Preferences > Printers & Scanners. Click the '+' button. Select the IP tab, enter the printer hostname (e.g., ny-printer-2b.local), and select the protocol 'Line Printer Daemon (LPD)'.
+3. Click 'Add' and confirm the default paper tray configurations.
+
+[Section: Clear Print Queue]
+Description: Stuck print documents halt all subsequent print jobs. Clearing the print queue resolves stalled printers.
+Steps:
+1. Open Printers & Scanners and double-click the active printer to see the queue.
+2. Select any jobs showing 'Error' or 'Spooling' state, right-click, and select 'Cancel'.
+3. If they won't clear, open Windows Services (services.msc), stop the 'Print Spooler' service.
+4. Delete all files inside: C:\Windows\System32\spool\PRINTERS\
+5. Start the 'Print Spooler' service again.
+
+[Section: Driver Installation]
+Description: Generic drivers might print gibberish characters or fail to utilize color and tray options.
+Steps:
+1. Identify the printer model (e.g., HP LaserJet Enterprise M608 or Xerox Altalink C8000).
+2. Download the corporate-approved driver from the manufacturer portal.
+3. Install the driver installer package. On macOS, choose the downloaded driver profile from the 'Use:' dropdown when adding the printer instead of generic 'AirPrint'.

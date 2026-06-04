@@ -1,0 +1,26 @@
+=== Document: email_config.txt ===
+Title: Email Client Configuration and Mailbox Management
+Category: Email Issue
+
+[Section: Outlook Profile Setup]
+Description: Setting up Outlook for desktop or mobile and regenerating a corrupted mail profile.
+Steps:
+1. Open Outlook. If prompted for a profile, enter a name and click OK.
+2. Enter your corporate email address, check 'Let me set up my account manually', and click Connect.
+3. Authenticate via the Single Sign-On (SSO) prompt.
+4. If Outlook is crashing, go to Control Panel > Mail > Show Profiles. Click 'Add...', create a new profile name, set it as 'Always use this profile', and configure the account.
+
+[Section: Shared Mailbox Access]
+Description: Accessing shared mailboxes (e.g. support@company.com or sales@company.com) delegated to you.
+Steps:
+1. Ensure your manager has requested access for you via the Identity portal.
+2. Outlook Desktop: Go to File > Account Settings > Account Settings. Select your email, click 'Change...', click 'More Settings', select the 'Advanced' tab, click 'Add...', type the shared mailbox name, click OK.
+3. Outlook Web: Click on your profile icon in the top right corner, select 'Open another mailbox', type the shared email, and press Open.
+
+[Section: Webmail Fallback]
+Description: Accessing corporate email when the Outlook desktop application fails or is unavailable.
+Steps:
+1. Open a browser and navigate to: https://outlook.office.com/
+2. Log in using your corporate email address and Active Directory password.
+3. Approve the MFA request on your mobile device.
+4. Verify if email sending and receiving works on webmail. If webmail works, the issue is isolated to your desktop client.

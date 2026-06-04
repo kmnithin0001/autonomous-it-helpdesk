@@ -1,0 +1,31 @@
+=== Document: vpn_guide.txt ===
+Title: VPN Configuration and Troubleshooting Guide
+Category: VPN Issue
+
+[Section: Check Internet Connection]
+Description: Before attempting to connect to the corporate VPN, verify that your local internet connection is active and stable.
+Steps:
+1. Open a web browser and navigate to a public site like google.com.
+2. Run a speed test (fast.com) to ensure your latency is under 150ms and bandwidth is at least 5 Mbps.
+3. If using Wi-Fi, try switching to a wired ethernet cable or move closer to the router.
+
+[Section: Restart VPN Service]
+Description: The local VPN service client (Pulse Connect or Cisco AnyConnect) may be hung. Restarting the client or the operating system service resolves 80% of issues.
+Steps:
+1. Close the VPN client application completely.
+2. Open Windows Services (services.msc), locate 'Cisco AnyConnect Secure Mobility Client' or 'Pulse Secure Service', right-click and choose 'Restart'.
+3. On macOS, open Terminal and execute: sudo launchctl kickstart -k system/com.cisco.anyconnect.vpnagentd
+4. Re-open the VPN client and try connecting again.
+
+[Section: Verify Credentials]
+Description: Expired passwords or unsynced multi-factor authentication (MFA) tokens will cause the VPN connection to fail.
+Steps:
+1. Navigate to the corporate portal (portal.office.com) to verify that your active directory password is correct and has not expired.
+2. Check your registered mobile device for any pending Duo or Microsoft Authenticator push notifications.
+3. If your password was changed recently, clear your cached credentials in the VPN client settings and enter the new password.
+
+[Section: Firewall Configuration]
+Description: Local firewalls or public networks (hotels/cafes) may block the ports required for secure VPN tunnels.
+Steps:
+1. Ensure your local antivirus or Windows Defender Firewall is not blocking outgoing UDP ports 500 and 4500, or TCP port 443.
+2. If connecting from a hotel or public hotspot, VPN protocols (IPsec/SSL) might be blocked by the network operator. Try connecting via a mobile hotspot.

@@ -1,0 +1,21 @@
+# Virtual Environment
+venv/
+.venv/
+Env/
+env/
+
+# Python Cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environmental variables (contains secrets!)
+.env
+
+# Database & Chroma storage binaries
+helpdesk.db
+vectordb/chroma/
+
+# Log files (contain session data)
+logs/*.log
+!logs/.gitkeep
