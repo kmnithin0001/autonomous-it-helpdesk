@@ -6,7 +6,7 @@ from pydantic import BaseModel, Field
 
 from a2a.protocol import A2AMessage
 from memory.conversation_store import get_session_context, update_session_context, save_conversation
-from memory.sqlite_memory import create_ticket, log_user_feedback, get_ticket
+from memory.sqlite_memory import create_ticket, log_user_feedback, get_ticket, resolve_ticket
 
 # Load centralized logging configurations
 from logs.logging_config import agent_logger
@@ -167,14 +167,23 @@ class CoordinatorAgent:
             q_clean = query.lower().strip()
             
             # Evaluate user response
-            if q_clean in ["yes", "y", "solved", "resolved", "it worked", "thanks", "fixed", "yes it did", "yes it does"]:
+            is_positive = q_clean in ["yes", "y", "solved", "resolved", "it worked", "thanks", "fixed", "yes it did", "yes it does"]
+            
+            negative_keywords = [
+                "no", "not solved", "persists", "did not work", "still failing", 
+                "unresolved", "it still doesn't work", "i tried everything", 
+                "still doesn't work", "tried everything"
+            ]
+            is_negative = q_clean in ["no", "n"] or any(neg in q_clean for neg in negative_keywords)
+            
+            if is_positive:
                 # Log success feedback and close ticket
                 log_user_feedback(ticket_id, solved=True)
                 update_session_context(session_obj, ticket_status="resolved")
                 
                 response_text = f"Excellent! I have resolved and closed your ticket [green]TCK-{ticket_id}[/green]. Please let me know if you need help with anything else!"
                 save_conversation(ticket_id, "System", response_text)
-            elif q_clean in ["no", "n", "not solved", "persists", "did not work", "still failing", "no it did not", "unresolved"]:
+            elif is_negative:
                 # Log failure feedback and trigger Escalation Agent over A2A
                 log_user_feedback(ticket_id, solved=False)
                 
@@ -210,21 +219,49 @@ class CoordinatorAgent:
 
         # State: TICKET RESOLVED / ESCALATED (End states)
         else:
-            # Open a new ticket for new requests
-            agent_logger.info(f"[{trace_id}] Ticket {ticket_id} is in end state '{ticket_status}'. Opening new ticket.")
-            update_session_context(
-                session_obj,
-                ticket_id=None,
-                issue_category=None,
-                ticket_status="new",
-                diagnostic_steps=[],
-                knowledge_articles=[],
-                escalation_status=None
-            )
-            response_payload["ticket_id"] = None
+            # Check if user is reporting failure on the resolved ticket
+            q_clean = query.lower().strip()
+            negative_keywords = [
+                "no", "not solved", "persists", "did not work", "still failing", 
+                "unresolved", "it still doesn't work", "i tried everything", 
+                "still doesn't work", "tried everything"
+            ]
+            is_negative = q_clean in ["no", "n"] or any(neg in q_clean for neg in negative_keywords)
             
-            # Recurse with status reset
-            return self.handle_a2a_message(message)
+            if ticket_status == "resolved" and is_negative:
+                agent_logger.info(f"[{trace_id}] Ticket {ticket_id} was resolved, but user reports failure: '{query}'. Escalating.")
+                log_user_feedback(ticket_id, solved=False)
+                
+                # Run escalation
+                response_text = self._escalate_flow(
+                    ticket_id=ticket_id,
+                    category=category,
+                    summary=f"Unresolved: {category}",
+                    reason="User reported issue unresolved after attempting recommended troubleshooting steps.",
+                    user_id=user_id,
+                    session_id=session_id,
+                    trace_id=trace_id,
+                    session_obj=session_obj,
+                    response_payload=response_payload,
+                    diagnostic_steps=diagnostic_steps,
+                    diagnostic_state=payload.get("diagnostic_state", {})
+                )
+            else:
+                # Open a new ticket for new requests
+                agent_logger.info(f"[{trace_id}] Ticket {ticket_id} is in end state '{ticket_status}'. Opening new ticket.")
+                update_session_context(
+                    session_obj,
+                    ticket_id=None,
+                    issue_category=None,
+                    ticket_status="new",
+                    diagnostic_steps=[],
+                    knowledge_articles=[],
+                    escalation_status=None
+                )
+                response_payload["ticket_id"] = None
+                
+                # Recurse with status reset
+                return self.handle_a2a_message(message)
 
         latency = time.time() - start_time
         response_payload["query_response"] = response_text
@@ -272,6 +309,13 @@ class CoordinatorAgent:
             ticket_status="awaiting_feedback",
             diagnostic_steps=steps,
             knowledge_articles=[doc]
+        )
+        
+        # Auto-resolve the ticket in the database upon successful generation of troubleshooting resolution
+        resolve_ticket(
+            ticket_id=ticket_id,
+            summary=recs,
+            source=doc
         )
         
         # Update payload parameters to pass back to CLI (for feedback loops)

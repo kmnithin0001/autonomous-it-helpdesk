@@ -38,6 +38,9 @@ def init_db():
         status TEXT NOT NULL DEFAULT 'open',
         created_at TEXT NOT NULL,
         updated_at TEXT NOT NULL,
+        resolved_at TEXT,
+        resolution_summary TEXT,
+        resolution_source TEXT,
         FOREIGN KEY(user_id) REFERENCES Users(user_id)
     )
     """)
@@ -105,6 +108,20 @@ def init_db():
         FOREIGN KEY(ticket_id) REFERENCES Tickets(ticket_id)
     )
     """)
+    
+    # Run dynamic schema migrations to add resolution columns to Tickets if they don't exist
+    try:
+        cursor.execute("ALTER TABLE Tickets ADD COLUMN resolved_at TEXT")
+    except sqlite3.OperationalError:
+        pass
+    try:
+        cursor.execute("ALTER TABLE Tickets ADD COLUMN resolution_summary TEXT")
+    except sqlite3.OperationalError:
+        pass
+    try:
+        cursor.execute("ALTER TABLE Tickets ADD COLUMN resolution_source TEXT")
+    except sqlite3.OperationalError:
+        pass
     
     conn.commit()
     conn.close()
@@ -198,6 +215,25 @@ def update_ticket_status(ticket_id: int, status: str) -> bool:
     cursor.execute("""
     UPDATE Tickets SET status = ?, updated_at = ? WHERE ticket_id = ?
     """, (status, now_str, ticket_id))
+    rows_affected = cursor.rowcount
+    conn.commit()
+    conn.close()
+    return rows_affected > 0
+
+def resolve_ticket(ticket_id: int, summary: str, source: str) -> bool:
+    """Sets a ticket's status to resolved, and stores resolution metadata."""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    now_str = datetime.now().isoformat()
+    cursor.execute("""
+    UPDATE Tickets 
+    SET status = 'resolved', 
+        updated_at = ?, 
+        resolved_at = ?, 
+        resolution_summary = ?, 
+        resolution_source = ? 
+    WHERE ticket_id = ?
+    """, (now_str, now_str, summary, source, ticket_id))
     rows_affected = cursor.rowcount
     conn.commit()
     conn.close()

@@ -24,6 +24,11 @@ class MessageRouter:
     def __init__(self):
         self._agents: Dict[str, Any] = {}
         self.console = Console()
+        self._listeners = []
+        
+    def register_listener(self, callback) -> None:
+        """Registers a callback to receive routed A2A messages in real-time."""
+        self._listeners.append(callback)
         
     def register_agent(self, agent_name: str, agent_instance: Any) -> None:
         """Registers an agent instance with the routing table.
@@ -57,6 +62,23 @@ class MessageRouter:
         # Synchronize thread logging context before dispatch
         set_log_context(trace_id=trace_id, session_id=session_id, ticket_id=ticket_id)
         
+        # Trigger listener for dispatching
+        for callback in getattr(self, "_listeners", []):
+            try:
+                callback({
+                    "event": "a2a_message_dispatch",
+                    "sender": message.sender,
+                    "receiver": message.receiver,
+                    "task": message.task,
+                    "trace_id": trace_id,
+                    "session_id": session_id,
+                    "ticket_id": ticket_id,
+                    "timestamp": datetime_str(),
+                    "payload": {k: v for k, v in message.payload.items() if not k.startswith("_")}
+                })
+            except Exception:
+                pass
+        
         # 2. Visual log for dispatching event
         self.display_message_rich(message, trace_id, "ROUTING")
         
@@ -85,12 +107,48 @@ class MessageRouter:
             self.console.print(f"[bold red]A2A RUNTIME EXCEPTION in '{message.receiver}':[/bold red] {e}")
             
             self.log_message(message, latency, trace_id, session_id, ticket_id, status="ERROR", error=error_str)
+            
+            # Trigger listener for error
+            for callback in getattr(self, "_listeners", []):
+                try:
+                    callback({
+                        "event": "a2a_message_error",
+                        "sender": message.sender,
+                        "receiver": message.receiver,
+                        "task": message.task,
+                        "trace_id": trace_id,
+                        "session_id": session_id,
+                        "ticket_id": ticket_id,
+                        "timestamp": datetime_str(),
+                        "latency_ms": round(latency * 1000, 2),
+                        "error": error_str
+                    })
+                except Exception:
+                    pass
             raise e
             
         latency = time.time() - start_time
         
         # 4. Log message transaction to database and log file
         self.log_message(message, latency, trace_id, session_id, ticket_id)
+        
+        # Trigger listener for completion
+        for callback in getattr(self, "_listeners", []):
+            try:
+                callback({
+                    "event": "a2a_message_completed",
+                    "sender": response.sender if isinstance(response, A2AMessage) else message.receiver,
+                    "receiver": response.receiver if isinstance(response, A2AMessage) else message.sender,
+                    "task": response.task if isinstance(response, A2AMessage) else message.task,
+                    "trace_id": trace_id,
+                    "session_id": session_id,
+                    "ticket_id": ticket_id,
+                    "timestamp": datetime_str(),
+                    "latency_ms": round(latency * 1000, 2),
+                    "payload": {k: v for k, v in response.payload.items() if not k.startswith("_")} if isinstance(response, A2AMessage) else {}
+                })
+            except Exception:
+                pass
         
         # 5. Display response event details
         if isinstance(response, A2AMessage):
