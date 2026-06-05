@@ -10,7 +10,7 @@
 
 **Submitted in partial fulfillment of the requirements for the evaluation of AI/ML projects.**
 
-* **Student Name:** K nithin kumar  
+* **Student Name:** K Nithin Kumar  
 * **Guide Name:** Prajapati Lekha Nanku  
 * **Batch:** AIML Batch 8  
 * **Academic Year:** 2026  
