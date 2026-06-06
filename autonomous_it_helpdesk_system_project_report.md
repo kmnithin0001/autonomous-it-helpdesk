@@ -725,19 +725,19 @@ The following screenshots capture the working interface, live dashboard metrics,
 
 ### 1. Enterprise SaaS Dashboard & Operational Metrics
 Tracks active ticket counts, automation service registries, and recent activities in real time.
-![SaaS Dashboard](docs/screenshots/Screenshot%202026-06-04%20125646.png)
+![SaaS Dashboard](docs/screenshots/Screenshot%202026-06-06%20105518.png)
 
 ### 2. Support Requests Intake & Portal Page
 Allows corporate employees to submit support incidents and track ticket queues.
-![Support Requests Intake Page](docs/screenshots/Screenshot%202026-06-04%20125743.png)
+![Support Requests Intake Page](docs/screenshots/Screenshot%202026-06-06%20105543.png)
 
 ### 3. AI Assistant Chat & Auto-Diagnostics Loop
 Displays natural language chats, confidence scores, and collapsible troubleshooting diagnostic logs.
-![AI Assistant Chat View](docs/screenshots/Screenshot%202026-06-04%20125757.png)
+![AI Assistant Chat View](docs/screenshots/Screenshot%202026-06-06%20105559.png)
 
 ### 4. Ticket Auto-Resolution Guide & Citation Reference
 Shows the diagnostic recommendation and retrieved knowledge base citation delivered to the user.
-![Auto-Resolution Guide](docs/screenshots/Screenshot%202026-06-04%20125818.png)
+![Auto-Resolution Guide](docs/screenshots/Screenshot%202026-06-06%20105659.png)
 
 ### 5. Ticket Registry console & Filter Drawer
 Provides the administrative panel to search, filter, and inspect tickets in detail.
